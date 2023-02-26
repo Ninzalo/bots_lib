@@ -1,3 +1,1 @@
-bot
-runners
-server
+bots_lib

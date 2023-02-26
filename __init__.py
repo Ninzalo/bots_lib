@@ -1,1 +1,1 @@
-from . import bots_lib
+from . import bots

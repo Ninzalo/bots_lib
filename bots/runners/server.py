@@ -115,6 +115,6 @@ def run_server(
         messengers=messengers,
         message_reply_rate=message_reply_rate,
         transitions=transitions,
-        message_handler=message_handler
+        message_handler=message_handler,
     )
     server.start_server(local_ip=local_ip, local_port=local_port)

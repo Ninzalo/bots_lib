@@ -1,7 +1,6 @@
+import asyncio
 from dataclasses import dataclass, field
 from typing import Any, List, Literal
-
-from aiogram import asyncio
 
 
 @dataclass()

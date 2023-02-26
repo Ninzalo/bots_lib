@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .bots.base_config.base_config import ADDED_MESSENGERS
+from bots.base_config.base_config import ADDED_MESSENGERS
 
 
 @dataclass()

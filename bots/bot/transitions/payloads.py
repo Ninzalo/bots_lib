@@ -377,8 +377,8 @@ async def run(payloads: Payloads):
         pass
     print(output)
 
-
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
-loop.run_until_complete(run(p))
-loop.close()
+#
+# loop = asyncio.new_event_loop()
+# asyncio.set_event_loop(loop)
+# loop.run_until_complete(run(p))
+# loop.close()

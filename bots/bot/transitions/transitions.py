@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, List
 
 from bots.bot.struct import Message_struct
+from bots.bot.transitions.payloads import Payloads
 
 
 @dataclass()
@@ -18,7 +19,7 @@ class Transitions:
     """
 
     transitions: List[Transition] = field(default_factory=list)
-    payloads: Any = None
+    payloads: Payloads | None = None
     _compiled: bool = False
 
     def add_transition(self, trigger: str | None, src: str, dst: Any):

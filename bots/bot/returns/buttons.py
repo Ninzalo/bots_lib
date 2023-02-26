@@ -1,6 +1,6 @@
 from typing import List
 from dataclasses import dataclass, field
-from base_config.base_config import (
+from bots.base_config.base_config import (
     BUTTONS_COLORS,
     DEBUG_STATE,
     MAX_BUTTONS_IN_ROW,

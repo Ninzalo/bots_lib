@@ -1,8 +1,8 @@
 import asyncio
 from aiogram import types, executor, Dispatcher
-from bot.struct import Message_struct
-from bot.converters import str_to_dict
-from server.server_func import send_to_server
+from bots.bot.struct import Message_struct
+from bots.bot.converters import str_to_dict
+from bots.server.server_func import send_to_server
 
 
 class Tg_client:

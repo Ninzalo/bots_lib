@@ -1,11 +1,11 @@
 import asyncio
 from datetime import datetime
 import pickle
-from bot.converters import dataclass_from_dict
-from bot.returns.message import Return, Returns
-from bot.struct import Message_struct
-from bot.throttlers import ThrottledResource
-from bot.reply.reply_division import Messengers_division
+from bots.bot.converters import dataclass_from_dict
+from bots.bot.returns.message import Return, Returns
+from bots.bot.struct import Message_struct
+from bots.bot.throttlers import ThrottledResource
+from bots.bot.reply.reply_division import Messengers_division
 
 
 class Server:

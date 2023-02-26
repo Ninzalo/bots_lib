@@ -27,9 +27,8 @@ class Server:
     def _check_errors(self) -> None:
         if not self._messengers._compiled:
             raise RuntimeError(f"Messengers aren't compiled")
-        if self._transitions != None:
-            if not self._transitions._compiled:
-                raise RuntimeError(f"Transitions aren't compiled")
+        if not self._transitions._compiled:
+            raise RuntimeError(f"Transitions aren't compiled")
 
     async def handle_echo(
         self,

@@ -68,7 +68,7 @@ def start_tg_client(
     dispatcher: Dispatcher, handler_ip: str, handler_port: int
 ) -> None:
     tg_client = _get_tg_client(
-        dispatcher=dispatcher, local_ip=handler_ip, local_port=handler_port
+        dispatcher=dispatcher, handler_ip=handler_ip, handler_port=handler_port
     )
     tg_client.start_tg_client()
 
@@ -77,7 +77,7 @@ def run_test(
     dispatcher: Dispatcher, handler_ip: str, handler_port: int
 ) -> None:
     tg_client = _get_tg_client(
-        dispatcher=dispatcher, local_ip=handler_ip, local_port=handler_port
+        dispatcher=dispatcher, handler_ip=handler_ip, handler_port=handler_port
     )
     tg_client.run_test()
 

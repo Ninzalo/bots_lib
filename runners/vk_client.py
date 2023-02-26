@@ -1,7 +1,7 @@
 import json
 from vkbottle import GroupEventType
 from vkbottle.bot import Message, MessageEvent, Bot
-from bot.struct import Message_struct
+from ..bot.struct import Message_struct
 from server.server_func import send_to_server
 
 

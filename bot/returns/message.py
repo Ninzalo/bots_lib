@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 from .buttons import Buttons, Inline_buttons
-from base_config import ADDED_MESSENGERS
+from ...base_config import ADDED_MESSENGERS
 
 
 @dataclass()

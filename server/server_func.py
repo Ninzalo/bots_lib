@@ -1,7 +1,7 @@
 import asyncio
 import pickle
-from bot.struct import Message_struct
-from bot.converters import dataclass_to_dict
+from ..bot.struct import Message_struct
+from ..bot.converters import dataclass_to_dict
 
 
 async def send_to_server(message: Message_struct, local_ip: str, local_port: int):

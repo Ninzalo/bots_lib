@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from ..base_config import ADDED_MESSENGERS
+from base_config import ADDED_MESSENGERS
 
 
 @dataclass()

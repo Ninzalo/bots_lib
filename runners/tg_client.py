@@ -1,7 +1,7 @@
 import asyncio
 from aiogram import types, executor, Dispatcher
-from ..bot.struct import Message_struct
-from ..bot.converters import str_to_dict
+from bot.struct import Message_struct
+from bot.converters import str_to_dict
 from server.server_func import send_to_server
 
 

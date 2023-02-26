@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any, List
 
+from bots.bot.struct import Message_struct
+
 
 @dataclass()
 class Transition:
@@ -14,6 +16,7 @@ class Transitions:
     """
     param payloads: Should be Payloads class
     """
+
     transitions: List[Transition] = field(default_factory=list)
     payloads: Any = None
     _compiled: bool = False
@@ -42,11 +45,15 @@ class Transitions:
             self.transitions.append(new_transition)
 
     def compile(self):
+        if len(self.transitions) == 0:
+            raise RuntimeError(f"Can't compile while no transitions added")
         self._add_none_transition_to_all_stages()
         self.transitions.sort(key=lambda src: src.from_stage)
         self._compiled = True
 
-    async def run(self, user_id: str | int, user_stage: str, message):
+    async def run(
+        self, user_id: str | int, user_stage: str, message: Message_struct
+    ):
         """
         Returns answer from transition
         param message: Should have .text/.payload

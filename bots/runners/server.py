@@ -2,11 +2,12 @@ import asyncio
 from datetime import datetime
 import pickle
 from bots.bot.converters import dataclass_from_dict
-from bots.bot.returns.message import Return, Returns
+from bots.bot.returns.message import Return
 from bots.bot.struct import Message_struct
 from bots.bot.throttlers import ThrottledResource
 from bots.bot.reply.reply_division import Messengers_division
 from bots.bot.transitions.transitions import Transitions
+from bots.message_handler.message_handler import Message_handler
 
 
 class Server:
@@ -15,12 +16,12 @@ class Server:
         messengers: Messengers_division,
         message_reply_rate: int | float,
         transitions: Transitions,
+        message_handler: Message_handler,
     ) -> None:
         self._messengers = messengers
-        if not self._messengers._compiled:
-            raise RuntimeError(f"Messengers aren't compiled")
         self._message_reply_rate = message_reply_rate
         self._transitions = transitions
+        self._message_handler = message_handler
         self._check_errors()
 
     def _check_errors(self) -> None:
@@ -45,11 +46,14 @@ class Server:
             message_cls = dataclass_from_dict(
                 struct=Message_struct, dictionary=message
             )
-            return_cls = Returns()
-            await return_cls.add_return(
-                user_id=message_cls.user_id,
-                user_messenger=message_cls.messenger,
-                text=f"Answer to '{message_cls.text}'",
+            # return_cls = Returns()
+            # await return_cls.add_return(
+            #     user_id=message_cls.user_id,
+            #     user_messenger=message_cls.messenger,
+            #     text=f"Answer to '{message_cls.text}'",
+            # )
+            return_cls = await self._message_handler.get(
+                message_class=message_cls
             )
             for answer in return_cls.returns:
                 task = asyncio.create_task(throttler.query(answer))
@@ -97,7 +101,8 @@ class Server:
 def run_server(
     messengers: Messengers_division,
     message_reply_rate: int | float,
-    transitions,
+    transitions: Transitions,
+    message_handler: Message_handler,
     local_ip: str,
     local_port: int,
 ) -> None:
@@ -105,5 +110,6 @@ def run_server(
         messengers=messengers,
         message_reply_rate=message_reply_rate,
         transitions=transitions,
+        message_handler=message_handler
     )
     server.start_server(local_ip=local_ip, local_port=local_port)

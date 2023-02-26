@@ -6,6 +6,7 @@ from bots.bot.returns.message import Return, Returns
 from bots.bot.struct import Message_struct
 from bots.bot.throttlers import ThrottledResource
 from bots.bot.reply.reply_division import Messengers_division
+from bots.bot.transitions.transitions import Transitions
 
 
 class Server:
@@ -13,11 +14,20 @@ class Server:
         self,
         messengers: Messengers_division,
         message_reply_rate: int | float,
-        transitions,
+        transitions: Transitions,
     ) -> None:
         self._messengers = messengers
+        if not self._messengers._compiled:
+            raise RuntimeError(f"Messengers aren't compiled")
         self._message_reply_rate = message_reply_rate
         self._transitions = transitions
+        self._check_errors()
+
+    def _check_errors(self) -> None:
+        if not self._messengers._compiled:
+            raise RuntimeError(f"Messengers aren't compiled")
+        if not self._transitions._compiled:
+            raise RuntimeError(f"Transitions aren't compiled")
 
     async def handle_echo(
         self,
@@ -25,7 +35,6 @@ class Server:
         writer: asyncio.streams.StreamWriter,
         throttler: ThrottledResource,
     ) -> None:
-        print(type(reader), type(writer))
         tasks = []
         while True:
             data = await reader.read()
@@ -50,9 +59,9 @@ class Server:
         writer.close()
 
     async def replier(self, return_cls: Return):
-        # await self._messengers.get_func(
-        #     messenger=return_cls.user_messenger, return_cls=return_cls
-        # )
+        await self._messengers.get_func(
+            messenger=return_cls.user_messenger, return_cls=return_cls
+        )
         request = (
             f"{'='*10}"
             f"\nTime: {datetime.now()}\nUser_id: {return_cls.user_id}"

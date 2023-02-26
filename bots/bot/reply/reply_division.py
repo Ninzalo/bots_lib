@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Any
-from bot.returns.message import Return
-from base_config.base_config import ADDED_MESSENGERS
+from bots.bot.returns.message import Return
+from bots.base_config.base_config import ADDED_MESSENGERS
 
 
 @dataclass()

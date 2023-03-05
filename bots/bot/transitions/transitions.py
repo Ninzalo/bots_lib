@@ -88,7 +88,7 @@ class Transitions:
                         answer = await transition.to_stage(
                             user_messenger_id, user_messenger
                         )
-                        print(answer, 'got answer')
+                        print(transition.to_stage, 'got answer')
                         return answer
 
             else_transition = await self._get_none_transition_by_stage(

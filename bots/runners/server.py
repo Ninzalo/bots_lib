@@ -47,8 +47,6 @@ class Server:
             return_cls = await self._message_handler.get(
                 message_class=message_cls
             )
-            print(return_cls)
-            print(return_cls.returns)
             for answer in return_cls.returns:
                 task = asyncio.create_task(throttler.query(answer))
                 tasks.append(task)

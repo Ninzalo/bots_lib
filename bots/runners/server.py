@@ -66,7 +66,8 @@ class Server:
         )
         request = (
             f"{'='*10}"
-            f"\nTime: {datetime.now()}\nUser_id: {return_cls.user_messenger_id}"
+            f"\nTime: {datetime.now()}"
+            f"\nUser_id: {return_cls.user_messenger_id}"
             f"\nMessage: {return_cls}"
             f"\n{'='*10}"
         )

@@ -75,7 +75,10 @@ class Transitions:
                 f"\nEnsure to compile transitions to run"
             )
         if message.text != None:
-            for transition in self._get_transitions_by_stage(stage=user_stage):
+            stage_transitions = await self._get_transitions_by_stage(
+                stage=user_stage
+            )
+            for transition in stage_transitions:
                 if transition.trigger == message.text:
                     return transition.to_stage(
                         user_messenger_id, user_messenger

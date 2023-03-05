@@ -100,7 +100,7 @@ class Transitions:
                 "user_messenger_id",
                 "user_messenger",
             ]:
-                answer = await else_transition(
+                answer = await else_transition.to_stage(
                     user_messenger_id, user_messenger
                 )
                 return answer

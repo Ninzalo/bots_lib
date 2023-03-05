@@ -49,11 +49,8 @@ class Transitions:
         else:
             self.transitions.append(new_transition)
 
-    def _checks(self) -> None:
-        if self.error_return == None:
-            raise RuntimeError("Error return wasn't added")
-        if len(self.transitions) == 0:
-            raise RuntimeError(f"Can't compile while no transitions added")
+    def add_error_return(self, error_func: Coroutine) -> None:
+        self.error_return = error_func
 
     def compile(self) -> None:
         self._checks()
@@ -141,6 +138,12 @@ class Transitions:
             if transition.trigger == None and transition.from_stage == stage:
                 return True
         return False
+
+    def _checks(self) -> None:
+        if self.error_return == None:
+            raise RuntimeError("Error return wasn't added")
+        if len(self.transitions) == 0:
+            raise RuntimeError(f"Can't compile while no transitions added")
 
     async def _get_transitions_by_stage(self, stage: str) -> List[Transition]:
         return [

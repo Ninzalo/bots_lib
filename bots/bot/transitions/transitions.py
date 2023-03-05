@@ -81,7 +81,7 @@ class Transitions:
             )
             for transition in stage_transitions:
                 if transition.trigger == message.text:
-                    if inspect.getfullargspec(transition.to_stage) == [
+                    if inspect.getfullargspec(transition.to_stage)[0] == [
                         "user_messenger_id",
                         "user_messenger",
                     ]:
@@ -97,7 +97,7 @@ class Transitions:
             else_transition = await self._get_none_transition_by_stage(
                 stage=user_stage
             )
-            if inspect.getfullargspec(else_transition) == [
+            if inspect.getfullargspec(else_transition)[0] == [
                 "user_messenger_id",
                 "user_messenger",
             ]:

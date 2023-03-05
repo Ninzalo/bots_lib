@@ -76,11 +76,12 @@ class Transitions:
                 f"\nEnsure to compile transitions to run"
             )
         if message.text != None:
+            print(message.text)
             stage_transitions = await self._get_transitions_by_stage(
                 stage=user_stage
             )
             for transition in stage_transitions:
-                if transition.trigger == message.text:
+                if transition.trigger == message.text.lower():
                     if inspect.getfullargspec(transition.to_stage)[0] == [
                         "user_messenger_id",
                         "user_messenger",
@@ -93,9 +94,6 @@ class Transitions:
             else_transition = await self._get_none_transition_by_stage(
                 stage=user_stage
             )
-            print(else_transition)
-            print(else_transition.to_stage)
-            print(inspect.getfullargspec(else_transition.to_stage))
             if inspect.getfullargspec(else_transition.to_stage)[0] == [
                 "user_messenger_id",
                 "user_messenger",

@@ -86,11 +86,11 @@ class Transitions:
                         "user_messenger",
                     ]:
                         print(
-                            transition.to_stage(
+                            await transition.to_stage(
                                 user_messenger_id, user_messenger
                             )
                         )
-                        return transition.to_stage(
+                        return await transition.to_stage(
                             user_messenger_id, user_messenger
                         )
 
@@ -101,7 +101,7 @@ class Transitions:
                 "user_messenger_id",
                 "user_messenger",
             ]:
-                return else_transition(user_messenger_id, user_messenger)
+                return await else_transition(user_messenger_id, user_messenger)
         elif message.payload != None:
             if self.payloads != None:
                 output = await self.payloads.run(entry_dict=message.payload)

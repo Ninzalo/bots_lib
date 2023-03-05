@@ -6,7 +6,6 @@ from bots.bot.returns.message import Return
 from bots.bot.struct import Message_struct
 from bots.bot.throttlers import ThrottledResource
 from bots.bot.reply.reply_division import Messengers_division
-from bots.bot.transitions.transitions import Transitions
 from bots.message_handler.message_handler import Message_handler
 
 
@@ -15,26 +14,20 @@ class Server:
         self,
         messengers: Messengers_division,
         message_reply_rate: int | float,
-        transitions: Transitions,
         message_handler: Message_handler,
     ) -> None:
         self._messengers = messengers
         self._message_reply_rate = message_reply_rate
-        self._transitions = transitions
         self._message_handler = message_handler
         self._check_errors()
 
     def _check_errors(self) -> None:
         if not self._messengers:
             raise RuntimeError(f"Messengers weren't added")
-        if not self._transitions:
-            raise RuntimeError(f"Transitions weren't added")
         if not self._message_handler:
             raise RuntimeError(f"Message handler wasn't added")
         if not self._messengers._compiled:
             raise RuntimeError(f"Messengers weren't compiled")
-        if not self._transitions._compiled:
-            raise RuntimeError(f"Transitions weren't compiled")
 
     async def handle_echo(
         self,
@@ -51,12 +44,6 @@ class Server:
             message_cls = dataclass_from_dict(
                 struct=Message_struct, dictionary=message
             )
-            # return_cls = Returns()
-            # await return_cls.add_return(
-            #     user_id=message_cls.user_id,
-            #     user_messenger=message_cls.messenger,
-            #     text=f"Answer to '{message_cls.text}'",
-            # )
             return_cls = await self._message_handler.get(
                 message_class=message_cls
             )
@@ -106,7 +93,6 @@ class Server:
 def run_server(
     messengers: Messengers_division,
     message_reply_rate: int | float,
-    transitions: Transitions,
     message_handler: Message_handler,
     local_ip: str,
     local_port: int,
@@ -114,7 +100,6 @@ def run_server(
     server = Server(
         messengers=messengers,
         message_reply_rate=message_reply_rate,
-        transitions=transitions,
         message_handler=message_handler,
     )
     server.start_server(local_ip=local_ip, local_port=local_port)

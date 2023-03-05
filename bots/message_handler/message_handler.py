@@ -1,3 +1,4 @@
+import inspect
 from typing import Coroutine
 from bots.bot.returns.message import Returns
 from bots.bot.struct import Message_struct
@@ -9,7 +10,7 @@ class Message_handler:
         self, user_stage_getter: Coroutine, transitions: Transitions
     ) -> None:
         """
-        param user_stage_getter: Should receive 'user_id' and 'messenger'
+        param user_stage_getter: Should receive 'user_messenger_id' and 'user_messenger'
         """
         self._transitions = transitions
         self._user_stage_getter = user_stage_getter
@@ -19,12 +20,22 @@ class Message_handler:
         user_stage = await self._user_stage_getter(
             message_class.user_id, message_class.messenger
         )
-        user_id = f"{message_class.user_id}{message_class.messenger}"
         return_cls = await self._transitions.run(
-            user_id=user_id, user_stage=user_stage, message=message_class
+            user_messenger_id=message_class.user_id,
+            user_messenger=message_class.messenger,
+            user_stage=user_stage,
+            message=message_class,
         )
         return return_cls
 
     def _checks(self) -> None:
         if not self._transitions._compiled:
             raise RuntimeError(f"Transitions aren't compiled")
+        if inspect.getfullargspec(self._user_stage_getter)[0] != [
+            "user_messenger_id",
+            "user_messenger",
+        ]:
+            raise RuntimeError(
+                "User stage getter don't receive 'user_messenger_id' "
+                "and 'user_messenger'"
+            )

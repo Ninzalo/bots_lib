@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Any, List
+from typing import Coroutine, List
+from bots.base_config.base_config import ADDED_MESSENGERS
 
 from bots.bot.struct import Message_struct
 from bots.bot.transitions.payloads import Payloads
@@ -9,7 +10,7 @@ from bots.bot.transitions.payloads import Payloads
 class Transition:
     trigger: str | None
     from_stage: str
-    to_stage: Any
+    to_stage: Coroutine
 
 
 @dataclass()
@@ -19,10 +20,13 @@ class Transitions:
     """
 
     transitions: List[Transition] = field(default_factory=list)
+    error_return: Coroutine | None = None
     payloads: Payloads | None = None
     _compiled: bool = False
 
-    def add_transition(self, trigger: str | None, src: str, dst: Any):
+    def add_transition(
+        self, trigger: str | None, src: str, dst: Coroutine
+    ) -> None:
         new_transition = Transition(
             trigger=trigger, from_stage=src, to_stage=dst
         )
@@ -45,15 +49,24 @@ class Transitions:
         else:
             self.transitions.append(new_transition)
 
-    def compile(self):
+    def _checks(self) -> None:
+        if self.error_return == None:
+            raise RuntimeError("Error return wasn't added")
         if len(self.transitions) == 0:
             raise RuntimeError(f"Can't compile while no transitions added")
+
+    def compile(self) -> None:
+        self._checks()
         self._add_none_transition_to_all_stages()
         self.transitions.sort(key=lambda src: src.from_stage)
         self._compiled = True
 
     async def run(
-        self, user_id: str | int, user_stage: str, message: Message_struct
+        self,
+        user_messenger_id: int,
+        user_messenger: ADDED_MESSENGERS,
+        user_stage: str,
+        message: Message_struct,
     ):
         """
         Returns answer from transition
@@ -67,19 +80,25 @@ class Transitions:
         if message.text != None:
             for transition in self._get_transitions_by_stage(stage=user_stage):
                 if transition.trigger == message.text:
-                    return transition.to_stage(user_id)
+                    return transition.to_stage(
+                        user_messenger_id, user_messenger
+                    )
 
             else_transition = await self._get_none_transition_by_stage(
                 stage=user_stage
             )
-            return else_transition(user_id)
+            return else_transition(user_messenger_id, user_messenger)
         elif message.payload != None:
             if self.payloads != None:
                 output = await self.payloads.run(entry_dict=message.payload)
                 if output.get("data") == {}:
-                    return (output.get("dst"))(user_id)
+                    return (output.get("dst"))(
+                        user_messenger_id, user_messenger
+                    )
                 else:
-                    return (output.get("dst"))(user_id, output.get("data"))
+                    return (output.get("dst"))(
+                        user_messenger_id, user_messenger, output.get("data")
+                    )
 
     def _counter_none(self, src: str) -> int:
         amount = 0
@@ -89,7 +108,7 @@ class Transitions:
         return amount
 
     def _counter_unique(
-        self, trigger: str | dict | None, src: str, dst: Any
+        self, trigger: str | dict | None, src: str, dst: Coroutine
     ) -> int:
         amount = 0
         for transition in self.transitions:
@@ -112,7 +131,7 @@ class Transitions:
         for stage in self._get_all_source_stages():
             if not self._check_none_transition_by_stage(stage=stage):
                 self.add_transition(
-                    trigger=None, src=stage, dst="error_return"
+                    trigger=None, src=stage, dst=self.error_return
                 )
                 added_none_transitions += 1
         return added_none_transitions

@@ -51,7 +51,7 @@ class Server:
                 # task = asyncio.create_task(throttler.query(answer))
                 task = asyncio.create_task(
                     throttler_decorator(delay=1.0 / self._message_reply_rate)(
-                        await self.replier(answer) 
+                        await self.replier(answer)
                     )
                 )
                 tasks.append(task)
@@ -66,7 +66,7 @@ class Server:
         )
         request = (
             f"{'='*10}"
-            f"\nTime: {datetime.now()}\nUser_id: {return_cls.user_id}"
+            f"\nTime: {datetime.now()}\nUser_id: {return_cls.user_messenger_id}"
             f"\nMessage: {return_cls}"
             f"\n{'='*10}"
         )

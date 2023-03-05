@@ -76,6 +76,7 @@ class Transitions:
                 f"\nEnsure to compile transitions to run"
             )
         if message.text != None:
+            print(message.text.lower()[1:])
             stage_transitions = await self._get_transitions_by_stage(
                 stage=user_stage
             )

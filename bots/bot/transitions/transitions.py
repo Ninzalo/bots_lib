@@ -76,10 +76,8 @@ class Transitions:
                 "Transitions not compiled. "
                 f"\nEnsure to compile transitions to run"
             )
+        message.text = emoji.replace_emoji(message.text, replace="")
         if message.text != None:
-            message.text = emoji.get_emoji_regexp().sub(
-                r"", message.text.decode("utf8")
-            )
             stage_transitions = await self._get_transitions_by_stage(
                 stage=user_stage
             )

@@ -4,7 +4,7 @@ import pickle
 from bots.bot.converters import dataclass_from_dict
 from bots.bot.returns.message import Return
 from bots.bot.struct import Message_struct
-from bots.bot.throttlers import ThrottledResource
+from bots.bot.throttlers import ThrottledResource, throttler_decorator
 from bots.bot.reply.reply_division import Messengers_division
 from bots.message_handler.message_handler import Message_handler
 
@@ -48,7 +48,12 @@ class Server:
                 message_class=message_cls
             )
             for answer in return_cls.returns:
-                task = asyncio.create_task(throttler.query(answer))
+                # task = asyncio.create_task(throttler.query(answer))
+                task = asyncio.create_task(
+                    throttler_decorator(delay=1.0 / self._message_reply_rate)(
+                        answer
+                    )
+                )
                 tasks.append(task)
         addr = writer.get_extra_info("peername")
         print(f"Received {message_cls!r} from {addr!r}")

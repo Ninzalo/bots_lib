@@ -51,7 +51,7 @@ class Server:
                 # task = asyncio.create_task(throttler.query(answer))
                 task = asyncio.create_task(
                     throttler_decorator(delay=1.0 / self._message_reply_rate)(
-                        answer
+                        self.replier(answer) 
                     )
                 )
                 tasks.append(task)

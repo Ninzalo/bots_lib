@@ -6,7 +6,7 @@ from bots.base_config.base_config import ADDED_MESSENGERS
 
 @dataclass()
 class Return:
-    user_id: int
+    user_messenger_id: int
     user_messenger: ADDED_MESSENGERS
     text: str
     keyboard: Buttons | None = None
@@ -19,14 +19,14 @@ class Returns:
 
     async def add_return(
         self,
-        user_id: int,
+        user_messenger_id: int,
         user_messenger: ADDED_MESSENGERS,
         text: str,
         keyboard: Buttons | None = None,
         inline_keyboard: Inline_buttons | None = None,
     ):
         new_return = Return(
-            user_id=user_id,
+            user_messenger_id=user_messenger_id,
             user_messenger=user_messenger,
             text=text,
             keyboard=keyboard,

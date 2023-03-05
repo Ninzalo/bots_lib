@@ -85,11 +85,6 @@ class Transitions:
                         "user_messenger_id",
                         "user_messenger",
                     ]:
-                        print(
-                            await transition.to_stage(
-                                user_messenger_id, user_messenger
-                            )
-                        )
                         return await transition.to_stage(
                             user_messenger_id, user_messenger
                         )

@@ -48,12 +48,12 @@ class Server:
                 message_class=message_cls
             )
             for answer in return_cls.returns:
-                # task = asyncio.create_task(throttler.query(answer))
-                task = asyncio.create_task(
-                    throttler_decorator(delay=1.0 / self._message_reply_rate)(
-                        await self.replier(answer)
-                    )
-                )
+                task = asyncio.create_task(throttler.query(answer))
+                # task = asyncio.create_task(
+                #     throttler_decorator(delay=1.0 / self._message_reply_rate)(
+                #         await self.replier(answer)
+                #     )
+                # )
                 tasks.append(task)
         addr = writer.get_extra_info("peername")
         print(f"Received {message_cls!r} from {addr!r}")

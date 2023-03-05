@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import inspect
 from typing import Coroutine, List
 from bots.base_config.base_config import ADDED_MESSENGERS
 
@@ -80,14 +81,27 @@ class Transitions:
             )
             for transition in stage_transitions:
                 if transition.trigger == message.text:
-                    return transition.to_stage(
-                        user_messenger_id, user_messenger
-                    )
+                    if inspect.getfullargspec(transition.to_stage) == [
+                        "user_messenger_id",
+                        "user_messenger",
+                    ]:
+                        print(
+                            transition.to_stage(
+                                user_messenger_id, user_messenger
+                            )
+                        )
+                        return transition.to_stage(
+                            user_messenger_id, user_messenger
+                        )
 
             else_transition = await self._get_none_transition_by_stage(
                 stage=user_stage
             )
-            return else_transition(user_messenger_id, user_messenger)
+            if inspect.getfullargspec(else_transition) == [
+                "user_messenger_id",
+                "user_messenger",
+            ]:
+                return else_transition(user_messenger_id, user_messenger)
         elif message.payload != None:
             if self.payloads != None:
                 output = await self.payloads.run(entry_dict=message.payload)

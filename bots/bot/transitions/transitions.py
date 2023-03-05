@@ -173,4 +173,4 @@ class Transitions:
         for transition in self.transitions:
             if transition.trigger == None and transition.from_stage == stage:
                 return transition
-        raise Exception("No transition without a trigger in the transitions")
+        return self.error_return

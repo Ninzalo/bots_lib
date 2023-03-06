@@ -7,6 +7,7 @@ def throttler_decorator(
     delay: float,
     measure: Literal["end_to_start", "start_to_start"] = "start_to_start",
 ):
+    delay = delay + 0.0001
     def decorator(actual_func: Coroutine) -> Coroutine:
         queue = None
 
@@ -53,7 +54,7 @@ def throttler_decorator(
 
 class ThrottledResource:
     def __init__(self, delay: float, func_to_throttle: Coroutine):
-        self._delay = delay
+        self._delay = delay + 0.0001
         self._func = func_to_throttle
         self._queue = asyncio.Queue()
         self._task = None

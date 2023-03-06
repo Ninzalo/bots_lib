@@ -164,7 +164,7 @@ class Transitions:
         if len(self.transitions) == 0:
             raise RuntimeError(f"Can't compile while no transitions added")
         for transition in self.transitions:
-            self._args_check(func=transition.to_stage)
+            self._transition_args_check(func=transition.to_stage)
         self._transition_args_check(func=self.error_return)
         if self.payloads != None:
             if not self.payloads._compiled:

@@ -2,7 +2,7 @@ import emoji
 import inspect
 from dataclasses import dataclass, field
 from typing import Coroutine, List
-from bots.base_config.base_config import ADDED_MESSENGERS
+from bots.base_config.base_config import ADDED_MESSENGERS, DEBUG_STATE
 
 from bots.bot.struct import Message_struct
 from bots.bot.transitions.payloads import Payloads
@@ -18,6 +18,11 @@ class Transition:
 @dataclass()
 class Transitions:
     """
+    FSM (finite state machine). Add transitions and compile before using
+
+    param transitions: Added transitions
+    param error_return: Coroutine with 'user_messenger_id'
+    and 'user_messenger' args
     param payloads: Should be Payloads class
     """
 
@@ -45,20 +50,25 @@ class Transitions:
 
         if new_transition.trigger == None:
             if self._counter_none(src=src) > 0:
-                raise ValueError("Multiple 'else' blocks doesn't supported")
-
+                raise ValueError("Multiple 'else' blocks aren't supported")
             self.transitions.append(new_transition)
         else:
             self.transitions.append(new_transition)
+        if DEBUG_STATE:
+            print(f"Added transition: {new_transition}")
 
     def add_error_return(self, error_func: Coroutine) -> None:
         self.error_return = error_func
+        if DEBUG_STATE:
+            print(f"Added error return: {error_func}")
 
     def compile(self) -> None:
-        self._checks()
         self._add_none_transition_to_all_stages()
+        self._checks()
         self.transitions.sort(key=lambda src: src.from_stage)
         self._compiled = True
+        if DEBUG_STATE:
+            print(f"Transitions compiled successfully")
 
     async def run(
         self,
@@ -83,26 +93,17 @@ class Transitions:
             )
             for transition in stage_transitions:
                 if transition.trigger == message.text.lower():
-                    if inspect.getfullargspec(transition.to_stage)[0] == [
-                        "user_messenger_id",
-                        "user_messenger",
-                    ]:
-                        answer = await transition.to_stage(
-                            user_messenger_id, user_messenger
-                        )
-                        return answer
-
+                    answer = await transition.to_stage(
+                        user_messenger_id, user_messenger
+                    )
+                    return answer
             else_transition = await self._get_none_transition_by_stage(
                 stage=user_stage
             )
-            if inspect.getfullargspec(else_transition.to_stage)[0] == [
-                "user_messenger_id",
-                "user_messenger",
-            ]:
-                answer = await else_transition.to_stage(
-                    user_messenger_id, user_messenger
-                )
-                return answer
+            answer = await else_transition.to_stage(
+                user_messenger_id, user_messenger
+            )
+            return answer
         elif message.payload != None:
             if self.payloads != None:
                 output = await self.payloads.run(entry_dict=message.payload)
@@ -162,6 +163,23 @@ class Transitions:
             raise RuntimeError("Error return wasn't added")
         if len(self.transitions) == 0:
             raise RuntimeError(f"Can't compile while no transitions added")
+        for transition in self.transitions:
+            self._args_check(func=transition.to_stage)
+        self._transition_args_check(func=self.error_return)
+        if self.payloads != None:
+            if not self.payloads._compiled:
+                raise RuntimeError(f"Payloads aren't compiled")
+
+    def _transition_args_check(self, func: Coroutine) -> None:
+        if inspect.getfullargspec(func)[0] != [
+            "user_messenger_id",
+            "user_messenger",
+        ]:
+            error_str = (
+                f"Transition dst should have 'user_messenger_id' "
+                f"and 'user_messenger' args:\n{func}"
+            )
+            raise ValueError(error_str)
 
     async def _get_transitions_by_stage(self, stage: str) -> List[Transition]:
         return [

@@ -1,6 +1,6 @@
-import asyncio
 from dataclasses import dataclass, field
-from typing import Any, List, Literal
+from typing import Any, List
+from bots.base_config.base_config import ADDED_MESSENGERS
 
 
 @dataclass()
@@ -27,7 +27,7 @@ class Payloads:
     error_return: Payload | None = None
     shorten: bool = True
     words_to_shorten: List[str] = field(default_factory=list)
-    use_for: Literal["vk", "tg"] | None = "tg" if shorten else None
+    use_for: ADDED_MESSENGERS | None = "tg" if shorten else None
     show_info: bool = False
     _compiled: bool = False
 

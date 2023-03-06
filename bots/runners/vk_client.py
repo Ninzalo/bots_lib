@@ -1,6 +1,7 @@
 import json
 from vkbottle import GroupEventType
 from vkbottle.bot import Message, MessageEvent, Bot
+from bots.base_config.base_config import DEBUG_STATE
 from bots.bot.struct import Message_struct
 from bots.server.server_func import send_to_server
 
@@ -45,7 +46,7 @@ class Vk_client:
         )
 
     def start_vk_bot(self):
-        print(f"VK listening started")
+        print(f"VK listening started{' in Debug mode' if DEBUG_STATE else ''}")
         self._bot.run_forever()
 
 

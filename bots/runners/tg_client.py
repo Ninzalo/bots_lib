@@ -1,5 +1,7 @@
 import asyncio
+from datetime import datetime
 from aiogram import types, executor, Dispatcher
+from bots.base_config.base_config import DEBUG_STATE
 from bots.bot.struct import Message_struct
 from bots.bot.converters import str_to_dict
 from bots.server.server_func import send_to_server
@@ -43,7 +45,13 @@ class Tg_client:
 
     async def test_messages_rate(self):
         self._started = True
-        for num in range(30):
+        test_start_time = datetime.now()
+        if not DEBUG_STATE:
+            print(f"Failed to run test (running not in Debug mode)")
+            return
+        print(f"Rate test started at {test_start_time}")
+        messages_amount = 30
+        for num in range(messages_amount):
             message_struct = Message_struct(
                 user_id=432672691, messenger="tg", text=f"{num}"
             )
@@ -52,12 +60,16 @@ class Tg_client:
                 local_ip=self._local_ip,
                 local_port=self._local_port,
             )
+        print(
+            f"Rate test with {messages_amount} messages finished in "
+            f"{(datetime.now() - test_start_time).total_seconds()} seconds"
+        )
 
     def start_tg_client(self) -> None:
         if self._started:
             print(f"[ERROR] Ensure not to run test")
             return
-        print(f"TG listening started")
+        print(f"TG listening started{' in Debug mode' if DEBUG_STATE else ''}")
         executor.start_polling(self._dp, skip_updates=True)
 
     def run_test(self) -> None:

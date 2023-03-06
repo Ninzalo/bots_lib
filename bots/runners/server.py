@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 import pickle
+from bots.base_config.base_config import DEBUG_STATE
 from bots.bot.converters import dataclass_from_dict
 from bots.bot.returns.message import Return
 from bots.bot.struct import Message_struct
@@ -66,7 +67,8 @@ class Server:
             f"\nMessage: {return_cls}"
             f"\n{'='*10}"
         )
-        print(request)
+        if DEBUG_STATE:
+            print(request)
 
     async def main(self, local_ip: str, local_port: int) -> None:
         _throttler = ThrottledResource(
@@ -82,7 +84,7 @@ class Server:
         )
 
         addrs = ", ".join(str(sock.getsockname()) for sock in server.sockets)
-        print(f"Serving on {addrs}")
+        print(f"Serving on {addrs}{' in Debug mode' if DEBUG_STATE else ''}")
 
         async with server:
             await server.serve_forever()

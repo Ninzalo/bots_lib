@@ -16,7 +16,7 @@ class Message_handler:
         self._transitions = transitions
         self._user_stage_getter = user_stage_getter
         if DEBUG_STATE:
-            print(f"Added user stage getter: {user_stage_getter}\n")
+            print(f"Added user stage getter: {user_stage_getter}")
         self._checks()
 
     async def get(self, message_class: Message_struct) -> Returns:

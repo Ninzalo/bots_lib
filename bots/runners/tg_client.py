@@ -43,14 +43,13 @@ class Tg_client:
             local_port=self._local_port,
         )
 
-    async def test_messages_rate(self):
+    async def test_messages_rate(self, messages_amount: int):
         self._started = True
         test_start_time = datetime.now()
         if not DEBUG_STATE:
             print(f"Failed to run test (running not in Debug mode)")
             return
         print(f"Rate test started at {test_start_time}")
-        messages_amount = 30
         for num in range(messages_amount):
             message_struct = Message_struct(
                 user_id=432672691, messenger="tg", text=f"{num}"
@@ -72,8 +71,8 @@ class Tg_client:
         print(f"TG listening started{' in Debug mode' if DEBUG_STATE else ''}")
         executor.start_polling(self._dp, skip_updates=True)
 
-    def run_test(self) -> None:
-        asyncio.run(self.test_messages_rate())
+    def run_test(self, messages_amount: int) -> None:
+        asyncio.run(self.test_messages_rate(messages_amount=messages_amount))
 
 
 def start_tg_client(
@@ -86,12 +85,15 @@ def start_tg_client(
 
 
 def run_test(
-    dispatcher: Dispatcher, handler_ip: str, handler_port: int
+    dispatcher: Dispatcher,
+    handler_ip: str,
+    handler_port: int,
+    messages_amount: int,
 ) -> None:
     tg_client = _get_tg_client(
         dispatcher=dispatcher, handler_ip=handler_ip, handler_port=handler_port
     )
-    tg_client.run_test()
+    tg_client.run_test(messages_amount=messages_amount)
 
 
 def _get_tg_client(

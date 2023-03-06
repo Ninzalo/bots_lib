@@ -1,5 +1,6 @@
 import inspect
 from typing import Coroutine
+from bots.base_config.base_config import DEBUG_STATE
 from bots.bot.returns.message import Returns
 from bots.bot.struct import Message_struct
 from bots.bot.transitions.transitions import Transitions
@@ -15,6 +16,8 @@ class Message_handler:
         self._transitions = transitions
         self._user_stage_getter = user_stage_getter
         self._checks()
+        if DEBUG_STATE:
+            print(f"Added user stage getter: {user_stage_getter}\n")
 
     async def get(self, message_class: Message_struct) -> Returns:
         user_stage = await self._user_stage_getter(
@@ -39,3 +42,5 @@ class Message_handler:
                 "User stage getter don't receive 'user_messenger_id' "
                 "and 'user_messenger'"
             )
+        if DEBUG_STATE:
+            print(f"Message handler checks passed")

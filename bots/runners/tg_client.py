@@ -43,16 +43,16 @@ class Tg_client:
             local_port=self._local_port,
         )
 
-    async def test_messages_rate(self, messages_amount: int):
+    async def test_messages_rate(self, test_id: int, messages_amount: int):
         self._started = True
         test_start_time = datetime.now()
         if not DEBUG_STATE:
             print(f"Failed to run test (running not in Debug mode)")
             return
         print(f"Rate test started at {test_start_time}")
-        for num in range(messages_amount):
+        for num in range(1, messages_amount + 1):
             message_struct = Message_struct(
-                user_id=432672691, messenger="tg", text=f"{num}"
+                user_id=test_id, messenger="tg", text=f"{num}"
             )
             await send_to_server(
                 message=message_struct,
@@ -60,8 +60,8 @@ class Tg_client:
                 local_port=self._local_port,
             )
         print(
-            f"Rate test with {messages_amount} messages finished in "
-            f"{(datetime.now() - test_start_time).total_seconds()} seconds"
+            f"Rate test to {test_id} with {messages_amount} messages finished "
+            f"in {(datetime.now() - test_start_time).total_seconds()} seconds"
         )
 
     def start_tg_client(self) -> None:
@@ -71,20 +71,27 @@ class Tg_client:
         print(f"TG listening started{' in Debug mode' if DEBUG_STATE else ''}")
         executor.start_polling(self._dp, skip_updates=True)
 
-    def run_test(self, messages_amount: int) -> None:
-        asyncio.run(self.test_messages_rate(messages_amount=messages_amount))
+    def run_test(self, test_id: int, messages_amount: int) -> None:
+        asyncio.run(
+            self.test_messages_rate(
+                test_id=test_id, messages_amount=messages_amount
+            )
+        )
 
 
 def start_tg_client(
     dispatcher: Dispatcher, handler_ip: str, handler_port: int
 ) -> None:
     tg_client = _get_tg_client(
-        dispatcher=dispatcher, handler_ip=handler_ip, handler_port=handler_port
+        dispatcher=dispatcher,
+        handler_ip=handler_ip,
+        handler_port=handler_port,
     )
     tg_client.start_tg_client()
 
 
 def run_test(
+    test_id: int,
     dispatcher: Dispatcher,
     handler_ip: str,
     handler_port: int,
@@ -93,7 +100,7 @@ def run_test(
     tg_client = _get_tg_client(
         dispatcher=dispatcher, handler_ip=handler_ip, handler_port=handler_port
     )
-    tg_client.run_test(messages_amount=messages_amount)
+    tg_client.run_test(test_id=test_id, messages_amount=messages_amount)
 
 
 def _get_tg_client(

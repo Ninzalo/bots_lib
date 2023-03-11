@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 from typing import Literal
 
 
+@dataclass()
 class BaseConfig:
     ADDED_MESSENGERS = Literal["vk", "tg"]
     BUTTONS_COLORS = Literal["primary", "secondary", "positive", "negative"]

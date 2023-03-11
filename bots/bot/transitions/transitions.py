@@ -2,7 +2,7 @@ import emoji
 import inspect
 from dataclasses import dataclass, field
 from typing import Coroutine, List
-from bots.base_config.base_config import ADDED_MESSENGERS, DEBUG_STATE
+from bots.base_config import BaseConfig
 
 from bots.bot.struct import Message_struct
 from bots.bot.transitions.payloads import Payloads
@@ -29,6 +29,7 @@ class Transitions:
     transitions: List[Transition] = field(default_factory=list)
     error_return: Coroutine | None = None
     payloads: Payloads | None = None
+    config: BaseConfig = BaseConfig
     _compiled: bool = False
 
     def add_transition(
@@ -54,12 +55,12 @@ class Transitions:
             self.transitions.append(new_transition)
         else:
             self.transitions.append(new_transition)
-        if DEBUG_STATE:
+        if self.config.DEBUG_STATE:
             print(f"Added transition: {new_transition}")
 
     def add_error_return(self, error_func: Coroutine) -> None:
         self.error_return = error_func
-        if DEBUG_STATE:
+        if self.config.DEBUG_STATE:
             print(f"Added error return: {error_func}")
 
     def compile(self) -> None:
@@ -67,13 +68,13 @@ class Transitions:
         self._checks()
         self.transitions.sort(key=lambda src: src.from_stage)
         self._compiled = True
-        if DEBUG_STATE:
+        if self.config.DEBUG_STATE:
             print(f"Transitions compiled successfully")
 
     async def run(
         self,
         user_messenger_id: int,
-        user_messenger: ADDED_MESSENGERS,
+        user_messenger: BaseConfig.ADDED_MESSENGERS,
         user_stage: str,
         message: Message_struct,
     ):

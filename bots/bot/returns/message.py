@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 from typing import List
 from .buttons import Buttons, Inline_buttons
-from bots.base_config.base_config import ADDED_MESSENGERS
+from bots.base_config import BaseConfig
 
 
 @dataclass()
 class Return:
     user_messenger_id: int
-    user_messenger: ADDED_MESSENGERS
+    user_messenger: BaseConfig.ADDED_MESSENGERS
     text: str
     keyboard: Buttons | None = None
     inline_keyboard: Inline_buttons | None = None
@@ -20,7 +20,7 @@ class Returns:
     async def add_return(
         self,
         user_messenger_id: int,
-        user_messenger: ADDED_MESSENGERS,
+        user_messenger: BaseConfig.ADDED_MESSENGERS,
         text: str,
         keyboard: Buttons | None = None,
         inline_keyboard: Inline_buttons | None = None,

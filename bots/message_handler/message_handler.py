@@ -1,6 +1,6 @@
 import inspect
 from typing import Coroutine
-from bots.base_config.base_config import DEBUG_STATE
+from bots.base_config import BaseConfig
 from bots.bot.returns.message import Returns
 from bots.bot.struct import Message_struct
 from bots.bot.transitions.transitions import Transitions
@@ -8,14 +8,18 @@ from bots.bot.transitions.transitions import Transitions
 
 class Message_handler:
     def __init__(
-        self, user_stage_getter: Coroutine, transitions: Transitions
+        self,
+        user_stage_getter: Coroutine,
+        transitions: Transitions,
+        base_config: BaseConfig = BaseConfig,
     ) -> None:
         """
         param user_stage_getter: Should receive 'user_messenger_id' and 'user_messenger'
         """
         self._transitions = transitions
         self._user_stage_getter = user_stage_getter
-        if DEBUG_STATE:
+        self._config = base_config
+        if self._config.DEBUG_STATE:
             print(f"Added user stage getter: {user_stage_getter}")
         self._checks()
 
@@ -42,5 +46,5 @@ class Message_handler:
                 "User stage getter don't receive 'user_messenger_id' "
                 "and 'user_messenger'"
             )
-        if DEBUG_STATE:
+        if self._config.DEBUG_STATE:
             print(f"Message handler checks passed")

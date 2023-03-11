@@ -1,16 +1,23 @@
 import json
 from vkbottle import GroupEventType
 from vkbottle.bot import Message, MessageEvent, Bot
-from bots.base_config.base_config import DEBUG_STATE
+from bots.base_config import BaseConfig
 from bots.bot.struct import Message_struct
 from bots.server.server_func import send_to_server
 
 
 class Vk_client:
-    def __init__(self, handler: Bot, local_ip: str, local_port: int) -> None:
+    def __init__(
+        self,
+        handler: Bot,
+        local_ip: str,
+        local_port: int,
+        base_config: BaseConfig = BaseConfig,
+    ) -> None:
         self._bot = handler
         self._local_ip = local_ip
         self._local_port = local_port
+        self._config = base_config
         self._bot.on.raw_event(
             GroupEventType.MESSAGE_EVENT, dataclass=MessageEvent
         )(self.handle_callback_event)
@@ -46,12 +53,23 @@ class Vk_client:
         )
 
     def start_vk_bot(self):
-        print(f"VK listening started{' in Debug mode' if DEBUG_STATE else ''}")
+        print(
+            f"VK listening started"
+            f"{' in Debug mode' if self._config.DEBUG_STATE else ''}"
+        )
         self._bot.run_forever()
 
 
-def start_vk_client(handler: Bot, handler_ip: str, handler_port: int):
+def start_vk_client(
+    handler: Bot,
+    handler_ip: str,
+    handler_port: int,
+    base_config: BaseConfig = BaseConfig,
+):
     vk_client = Vk_client(
-        handler=handler, local_ip=handler_ip, local_port=handler_port
+        handler=handler,
+        local_ip=handler_ip,
+        local_port=handler_port,
+        base_config=base_config,
     )
     vk_client.start_vk_bot()

@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 import pickle
-from bots.base_config.base_config import DEBUG_STATE
+from bots.base_config import BaseConfig
 from bots.bot.converters import dataclass_from_dict
 from bots.bot.returns.message import Return
 from bots.bot.struct import Message_struct
@@ -16,10 +16,12 @@ class Server:
         messengers: Messengers_division,
         message_reply_rate: int | float,
         message_handler: Message_handler,
+        base_config: BaseConfig,
     ) -> None:
         self._messengers = messengers
         self._message_reply_rate = message_reply_rate
         self._message_handler = message_handler
+        self._config = base_config
         self._check_errors()
 
     def _check_errors(self) -> None:
@@ -45,7 +47,7 @@ class Server:
             message_cls = dataclass_from_dict(
                 struct=Message_struct, dictionary=message
             )
-            if DEBUG_STATE:
+            if self._config.DEBUG_STATE:
                 print(f"Fetching {message_cls} started at {datetime.now()}")
             return_cls = await self._message_handler.get(
                 message_class=message_cls
@@ -69,7 +71,7 @@ class Server:
             f"\nMessage: {return_cls}"
             f"\n{'='*10}"
         )
-        if DEBUG_STATE:
+        if self._config.DEBUG_STATE:
             print(request)
 
     async def main(self, local_ip: str, local_port: int) -> None:
@@ -86,7 +88,10 @@ class Server:
         )
 
         addrs = ", ".join(str(sock.getsockname()) for sock in server.sockets)
-        print(f"Serving on {addrs}{' in Debug mode' if DEBUG_STATE else ''}")
+        print(
+            f"Serving on {addrs}"
+            f"{' in Debug mode' if self._config.DEBUG_STATE else ''}"
+        )
 
         async with server:
             await server.serve_forever()
@@ -101,10 +106,12 @@ def run_server(
     message_handler: Message_handler,
     local_ip: str,
     local_port: int,
+    base_config: BaseConfig = BaseConfig,
 ) -> None:
     server = Server(
         messengers=messengers,
         message_reply_rate=message_reply_rate,
         message_handler=message_handler,
+        base_config=base_config,
     )
     server.start_server(local_ip=local_ip, local_port=local_port)

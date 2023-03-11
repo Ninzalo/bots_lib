@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 from typing import List, Any
 from bots.bot.returns.message import Return
-from bots.base_config.base_config import ADDED_MESSENGERS
+from bots.base_config import BaseConfig
 
 
 @dataclass()
 class _Messenger:
-    trigger: ADDED_MESSENGERS
+    trigger: BaseConfig.ADDED_MESSENGERS
     reply_func: Any
 
 
@@ -16,7 +16,7 @@ class Messengers_division:
     _compiled: bool = False
 
     def register_messenger(
-        self, trigger: ADDED_MESSENGERS, reply_func: Any
+        self, trigger: BaseConfig.ADDED_MESSENGERS, reply_func: Any
     ) -> None:
         if self._compiled:
             error_str = (
@@ -44,7 +44,7 @@ class Messengers_division:
             self._compiled = True
 
     async def get_func(
-        self, messenger: ADDED_MESSENGERS, return_cls: Return
+        self, messenger: BaseConfig.ADDED_MESSENGERS, return_cls: Return
     ) -> None:
         if self._compiled:
             for existing_messenger in self._messengers_to_answer:

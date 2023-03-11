@@ -45,6 +45,8 @@ class Server:
             message_cls = dataclass_from_dict(
                 struct=Message_struct, dictionary=message
             )
+            if DEBUG_STATE:
+                print(f"Fetching {message_cls} started at {datetime.now()}")
             return_cls = await self._message_handler.get(
                 message_class=message_cls
             )

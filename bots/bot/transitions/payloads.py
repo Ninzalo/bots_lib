@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List
+from typing import Any, Coroutine, List
 from bots.base_config import BaseConfig
 
 
@@ -27,11 +27,12 @@ class Payloads:
     error_return: Payload | None = None
     shorten: bool = True
     words_to_shorten: List[str] = field(default_factory=list)
-    use_for: BaseConfig.ADDED_MESSENGERS | None = "tg" if shorten else None
+    config: BaseConfig = BaseConfig
+    use_for: config.ADDED_MESSENGERS | None = "tg" if shorten else None
     show_info: bool = False
     _compiled: bool = False
 
-    def add_reference(self, path: str, src: str, dst: Any) -> None:
+    def add_reference(self, path: str, src: str, dst: Coroutine) -> None:
         """Adds reference payload
         Allows you to add new payload based on existing references"""
         if self._compiled:
@@ -45,8 +46,10 @@ class Payloads:
         if self.show_info:
             print(ref_dict)
         self._auto_create_payload(ref_dict=ref_dict, src=src, dst=dst)
+        if self.config.DEBUG_STATE:
+            print(f"Added reference payload: {ref_dict}")
 
-    def add_payload(self, path: str, src: str, dst: Any) -> None:
+    def add_payload(self, path: str, src: str, dst: Coroutine) -> None:
         """Adds new payload based on path"""
         if self._compiled:
             error_str = (
@@ -59,6 +62,8 @@ class Payloads:
         if self.show_info:
             print(new_payload_dict)
         self._add_payload(new_dict=new_payload_dict, src=src, dst=dst)
+        if self.config.DEBUG_STATE:
+            print(f"Added payload: {new_payload_dict}")
 
     def add_error_return(self, error_return: Any) -> None:
         if self.error_return != None:
@@ -75,10 +80,12 @@ class Payloads:
             dst=error_return,
             space_for_data=0,
         )
+        if self.config.DEBUG_STATE:
+            print(f"Added error return payload: {self.error_return}")
 
     def compile(self) -> None:
         """Compiles all Payloads
-        Prevents you from adding new payloads in runtime"""
+        Prevents you from adding new payloads at runtime"""
         if self.payloads == []:
             error_str = f"Failed to compile payloads \nNo payloads added"
             raise RuntimeError(error_str)
@@ -90,6 +97,31 @@ class Payloads:
         if self._compiled:
             raise RuntimeError(f"Payloads already compiled.")
         self._compiled = True
+        if self.config.DEBUG_STATE:
+            print(f"Payloads compiled successfully")
+
+    def add_words_to_shorten(self, word: str | List[str]) -> None:
+        if isinstance(word, list):
+            for w in word:
+                self.add_words_to_shorten(word=w)
+            return
+        self._value_type_check(value=word, type=str)
+        if len(self.payloads) > 0:
+            error_str = (
+                "Payloads were already created"
+                "\nEnsure to add words to shorten before "
+                "adding payloads or references"
+            )
+            raise RuntimeError(error_str)
+        if word in self.words_to_shorten:
+            error_str = f"Word '{word}' already in list of words to shorten"
+            raise ValueError(error_str)
+        if len(word) < 2:
+            error_str = f"Word '{word}' is already short"
+            raise ValueError(error_str)
+        self.words_to_shorten.append(word)
+        if self.config.DEBUG_STATE:
+            print(f"Words to shorten list appended by: {word}")
 
     async def run(self, entry_dict: dict) -> dict:
         """
@@ -102,7 +134,7 @@ class Payloads:
             raise RuntimeError(f"Payloads aren't compiled")
         self._value_type_check(entry_dict, dict)
         main_type = self._get_main_type_value(given_dict=entry_dict)
-        reference = self._find_exect_reference(
+        reference = self._find_exact_reference(
             main_type_value=main_type, given_dict=entry_dict
         )
         data_output = dict(
@@ -242,27 +274,6 @@ class Payloads:
                 if not new_payload in self.payloads:
                     self.payloads.append(new_payload)
 
-    def add_words_to_shorten(self, word: str | List[str]) -> None:
-        if isinstance(word, list):
-            for w in word:
-                self.add_words_to_shorten(word=w)
-            return
-        self._value_type_check(value=word, type=str)
-        if len(self.payloads) > 0:
-            error_str = (
-                "Payloads were already created"
-                "\nEnsure to add words to shorten before "
-                "adding payloads or references"
-            )
-            raise RuntimeError(error_str)
-        if word in self.words_to_shorten:
-            error_str = f"Word '{word}' already in list of words to shorten"
-            raise ValueError(error_str)
-        if len(word) < 2:
-            error_str = f"Word '{word}' is already short"
-            raise ValueError(error_str)
-        self.words_to_shorten.append(word)
-
     def _find_reference(self, main_type_value: str):
         self._value_type_check(main_type_value, str)
         for payload in self.payloads:
@@ -271,7 +282,7 @@ class Payloads:
         error_str = f"Can't find reference with main type {main_type_value}"
         raise ValueError(error_str)
 
-    def _find_exect_reference(self, main_type_value: str, given_dict: dict):
+    def _find_exact_reference(self, main_type_value: str, given_dict: dict):
         self._value_type_check(main_type_value, str)
         self._value_type_check(given_dict, dict)
         data_keys_and_values = self._get_type_data_from_dict(

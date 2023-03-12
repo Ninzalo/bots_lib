@@ -31,6 +31,10 @@ class Payloads:
     use_for: config.ADDED_MESSENGERS | None = "tg" if shorten else None
     _compiled: bool = False
 
+    def __post_init__(self):
+        if self.config.DEBUG_STATE:
+            print(f"Payloads are using for '{self.use_for}'")
+
     def add_reference(self, path: str, src: str, dst: Coroutine) -> None:
         """Adds reference payload
         Allows you to add new payload based on existing references"""

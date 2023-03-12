@@ -31,8 +31,11 @@ class Transitions:
     payloads: Payloads | None = None
     config: BaseConfig = BaseConfig
     _compiled: bool = False
-    if config.DEBUG_STATE and payloads == None:
-        print(f"Payloads aren't added")
+
+    def __post_init__(self):
+        if self.config.DEBUG_STATE:
+            if self.payloads == None:
+                print(f"Payloads aren't added")
 
     def add_transition(
         self, trigger: str | None, src: str, dst: Coroutine

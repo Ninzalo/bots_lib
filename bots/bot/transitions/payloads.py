@@ -29,7 +29,6 @@ class Payloads:
     words_to_shorten: List[str] = field(default_factory=list)
     config: BaseConfig = BaseConfig
     use_for: config.ADDED_MESSENGERS | None = "tg" if shorten else None
-    show_info: bool = False
     _compiled: bool = False
 
     def add_reference(self, path: str, src: str, dst: Coroutine) -> None:
@@ -43,8 +42,6 @@ class Payloads:
             raise RuntimeError(error_str)
         self._value_type_check(value=[path, src], type=str)
         ref_dict = self._parse_path(path=path)
-        if self.show_info:
-            print(ref_dict)
         self._auto_create_payload(ref_dict=ref_dict, src=src, dst=dst)
         if self.config.DEBUG_STATE:
             print(f"Added reference payload: {ref_dict}")
@@ -59,8 +56,6 @@ class Payloads:
             raise RuntimeError(error_str)
         self._value_type_check(value=[path, src], type=str)
         new_payload_dict = self._parse_path(path=path)
-        if self.show_info:
-            print(new_payload_dict)
         self._add_payload(new_dict=new_payload_dict, src=src, dst=dst)
         if self.config.DEBUG_STATE:
             print(f"Added payload: {new_payload_dict}")

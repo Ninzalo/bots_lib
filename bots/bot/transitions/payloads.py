@@ -32,6 +32,7 @@ class Payloads:
     _compiled: bool = False
 
     def __post_init__(self):
+        self.use_for = 'tg' if self.shorten else None
         if self.config.DEBUG_STATE:
             print(f"Payloads are using for '{self.use_for}'")
 

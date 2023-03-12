@@ -1,5 +1,5 @@
-import emoji
 import inspect
+from emoji import replace_emoji
 from dataclasses import dataclass, field
 from typing import Coroutine, List
 from bots.base_config import BaseConfig
@@ -92,7 +92,7 @@ class Transitions:
                 "Transitions not compiled. "
                 f"\nEnsure to compile transitions to run"
             )
-        message.text = emoji.replace_emoji(message.text, replace="")
+        message.text = replace_emoji(message.text, replace="")
         if message.text != None:
             stage_transitions = await self._get_transitions_by_stage(
                 stage=user_stage
